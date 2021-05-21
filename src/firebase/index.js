@@ -13,8 +13,6 @@ export const firestore = firebase.firestore();
 export const messaging = firebase.messaging();
 
 export const getToken = async () => {
-  const messaging = firebase.messaging();
-
   await messaging
     .getToken({
       vapidKey:
