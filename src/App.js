@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
-import { auth, messaging, onMessageListener } from './firebase';
+import firebase, { auth } from './firebase';
 import {
   signInWithEmail,
   signOut,
   signUpWithEmail,
 } from './firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { Toast } from 'react-bootstrap';
+import { Toast, Button } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useEffect } from 'react';
 
 function App() {
   const [user, loading, error] = useAuthState(auth);
@@ -22,41 +21,57 @@ function App() {
   const [password, setPassword] = useState('');
   const [isTokenFound, setTokenFound] = useState(false);
 
-  const getToken = async (setTokenFound) => {
-    try {
-      const currentToken = await messaging.getToken({
-        vapidKey:
-          'BIUyUG_QMFrIpJjbOhsX6vOGxu60V7ez8KOApzAV2cA7m5WcExCmMKgvJaRuOSyUIDdwr2IxnuNXr4g9Otr2au8',
-      });
-      if (currentToken) {
-        console.log('current token for client: ', currentToken);
-        setTokenFound(true);
-      } else {
-        console.log(
-          'No registration token available. Request permission to generate one.'
-        );
-        setTokenFound(false);
-        // shows on the UI that permission is required
-      }
-    } catch (err) {
-      console.log('An error occurred while retrieving token. ', err);
-    }
-  };
+  function handleBgCb(payload) {
+    if (firebase.messaging.isSupported) {
+      console.log(payload);
 
-  useEffect(() => {
-    getToken(setTokenFound);
-  }, []);
-
-  onMessageListener()
-    .then((payload) => {
       setShow(true);
       setNotification({
         title: payload.notification.title,
         body: payload.notification.body,
       });
-      console.log(payload);
-    })
-    .catch((err) => console.log('failed: ', err));
+    } else {
+      console.error('Messaging not supported');
+    }
+  }
+
+  function handleClick() {
+    if (firebase.messaging.isSupported) {
+      const messaging = firebase.messaging();
+      console.log(messaging);
+      messaging.onMessage(handleBgCb);
+      messaging
+        .getToken()
+        .then((currentToken) => {
+          if (currentToken) {
+            console.log('Token generated is ', currentToken);
+            setTokenFound(true);
+            setNotification({
+              title: 'success',
+              body: 'Token generated is: ' + currentToken,
+            });
+            // sendTokenToServer(currentToken);
+            // updateUIForPushEnabled(currentToken);
+          } else {
+            // Show permission request.
+            console.log('No ID token available. Request permission.');
+            setTokenFound(false);
+
+            // Show permission UI.
+            // updateUIForPushPermissionRequired();
+            // setTokenSentToServer(false);
+          }
+        })
+        .catch((err) =>
+          console.error(
+            'An error occurred while retrieving token. ',
+            err
+          )
+        );
+    } else {
+      console.error('Messaging not supported');
+    }
+  }
 
   const handleRegister = (e) => {
     e.preventDefault();
@@ -97,11 +112,6 @@ function App() {
           }}
         >
           <Toast.Header>
-            <img
-              src="holder.js/20x20?text=%20"
-              className="rounded mr-2"
-              alt=""
-            />
             <strong className="mr-auto">{notification.title}</strong>
             <small>just now</small>
           </Toast.Header>
@@ -109,20 +119,19 @@ function App() {
         </Toast>
         <div className="center">
           <h1>Welcome,</h1>
-          {/* <h3>username: {user.displayName}!</h3> */}
           <h3>{user.email}!</h3>
-          <br />
-          <button onClick={() => setShow(true)}>Show Toast</button>
-          {isTokenFound && (
+
+          <Button onClick={handleClick}>Get token</Button>
+          <Button onClick={() => setShow(true)}>Show Toast</Button>
+          {isTokenFound ? (
             <h3> Notification permission enabled 👍🏻 </h3>
-          )}
-          {!isTokenFound && (
+          ) : (
             <h3> Need notification permission ❗️ </h3>
           )}
 
-          <button type="button" onClick={signOut}>
+          <Button type="button" onClick={signOut}>
             Sign out
-          </button>
+          </Button>
         </div>
       </>
     ) : (
@@ -143,7 +152,7 @@ function App() {
             onChange={(e) => setPassword(e.target.value)}
           />
           <br />
-          <button type="submit">Sign in</button>
+          <Button type="submit">Sign in</Button>
         </form>
         <br />
         <hr />
@@ -174,9 +183,9 @@ function App() {
             onChange={(e) => setPassword(e.target.value)}
           />
           <br />
-          <button disabled={password.length < 8} type="submit">
+          <Button disabled={password.length < 8} type="submit">
             Register
-          </button>
+          </Button>
         </form>
         <br />
       </div>

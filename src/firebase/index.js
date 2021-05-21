@@ -10,11 +10,4 @@ if (!firebase.apps.length) {
 
 export const auth = firebase.auth();
 export const firestore = firebase.firestore();
-export const messaging = firebase.messaging();
-
-export const onMessageListener = () =>
-  new Promise((resolve) => {
-    messaging.onMessage((payload) => {
-      resolve(payload);
-    });
-  });
+export default firebase;
