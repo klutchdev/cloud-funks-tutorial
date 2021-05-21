@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { auth, messaging } from './firebase';
+import {
+  auth,
+  messaging,
+  receiveMessage,
+  requestPermission,
+} from './firebase';
 import {
   signInWithEmail,
   signOut,
@@ -21,16 +26,6 @@ function App() {
   const [password, setPassword] = useState('');
   const [isTokenFound, setTokenFound] = useState(false);
 
-  function handleBgCb(payload) {
-    console.log(payload);
-
-    setShow(true);
-    setNotification({
-      title: payload.notification.title,
-      body: payload.notification.body,
-    });
-  }
-
   const handleClick = async () => {
     console.log(messaging);
 
@@ -51,6 +46,7 @@ function App() {
           // Show permission request.
           console.log('No ID token available. Request permission.');
           setTokenFound(false);
+          requestPermission();
 
           // Show permission UI.
           // updateUIForPushPermissionRequired();
@@ -69,15 +65,16 @@ function App() {
     e.preventDefault();
     signUpWithEmail(email, password);
   };
+
   const handleSignIn = (e) => {
     e.preventDefault();
     signInWithEmail(email, password).catch((err) => alert(err));
   };
 
   useEffect(() => {
-    const onMsg = messaging.onMessage(handleBgCb);
+    receiveMessage();
 
-    return () => onMsg();
+    return () => receiveMessage();
   }, []);
 
   if (loading) {

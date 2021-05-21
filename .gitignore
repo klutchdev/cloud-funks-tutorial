@@ -24,3 +24,4 @@ yarn-error.log*
 .prettierrc
 # Local Netlify folder
 .netlify
+curl-test.sh
