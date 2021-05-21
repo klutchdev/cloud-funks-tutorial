@@ -24,3 +24,7 @@ yarn-error.log*
 .prettierrc
 # Local Netlify folder
 .netlify
+/functions/*
+firebase.json
+firebase.rules
+firestore.indexes.json
