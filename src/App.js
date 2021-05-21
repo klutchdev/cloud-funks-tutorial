@@ -67,19 +67,19 @@ function App() {
   };
 
   useEffect(() => {
-    const unsub = messaging.onMessage((payload) => {
+    messaging.onMessage((payload) => {
       console.log('Message received. ', payload);
+      const notificationTitle = payload.notification.title;
+      const notificationOptions = {
+        body: payload.notification.body,
+      };
 
-      new Notification(
-        payload.notification.title,
-        payload.notification
-      );
+      new Notification(notificationTitle, notificationOptions);
       setToast({
         title: payload.notification.title,
         body: payload.notification,
       });
     });
-    return () => unsub;
   }, []);
 
   if (loading) {
