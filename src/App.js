@@ -8,11 +8,12 @@ import {
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { Toast, Button, Form } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { useEffect } from 'react';
 
 function App() {
   const [user, loading, error] = useAuthState(auth);
   const [show, setShow] = useState(false);
-  const [notification, setNotification] = useState({
+  const [toast, setToast] = useState({
     title: '',
     body: '',
   });
@@ -30,7 +31,7 @@ function App() {
         if (currentToken) {
           console.log('Token generated is ', currentToken);
           setShow(true);
-          setNotification({
+          setToast({
             title: 'success',
             body: 'Token generated is: ' + currentToken,
           });
@@ -65,17 +66,21 @@ function App() {
     signInWithEmail(email, password).catch((err) => alert(err));
   };
 
-  messaging.onMessage((payload) => {
-    console.log('Message received. ', payload);
-    new Notification({
-      title: payload.notification.title,
-      body: payload.notification.body,
+  useEffect(() => {
+    const unsub = messaging.onMessage((payload) => {
+      console.log('Message received. ', payload);
+
+      new Notification(
+        payload.notification.title,
+        payload.notification
+      );
+      setToast({
+        title: payload.notification.title,
+        body: payload.notification,
+      });
     });
-    setNotification({
-      title: payload.notification.title,
-      body: payload.notification.body,
-    });
-  });
+    return () => unsub;
+  }, []);
 
   if (loading) {
     return (
@@ -107,13 +112,11 @@ function App() {
           }}
         >
           <Toast.Header>
-            <strong className="mr-auto">{notification.title}</strong>
+            <strong className="mr-auto">{toast.title}</strong>
             <small>just now</small>
           </Toast.Header>
           <Toast.Body>
-            <span style={{ color: '#212121' }}>
-              {notification.body}
-            </span>
+            <span style={{ color: '#212121' }}>{toast.body}</span>
           </Toast.Body>
         </Toast>
         <div className="center">
