@@ -12,19 +12,6 @@ export const auth = firebase.auth();
 export const firestore = firebase.firestore();
 export const messaging = firebase.messaging();
 
-export const receiveMessage = () => {
-  const messaging = firebase.messaging();
-
-  messaging.onMessage((payload) => {
-    console.log('Message received. ', payload);
-    new Notification({
-      title: payload.notification.title,
-      body: payload.notification.body,
-    });
-  });
-  // [END messaging_receive_message]
-};
-
 export const getToken = async () => {
   const messaging = firebase.messaging();
 
@@ -51,7 +38,7 @@ export const requestPermission = async () => {
   await Notification.requestPermission().then((permission) => {
     if (permission === 'granted') {
       console.log('Notification permission granted.');
-      getToken();
+      return getToken();
     } else {
       console.log('Unable to get permission to notify.');
     }

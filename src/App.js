@@ -1,17 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import {
-  auth,
-  messaging,
-  receiveMessage,
-  requestPermission,
-} from './firebase';
+import React, { useState } from 'react';
+import { auth, messaging, requestPermission } from './firebase';
 import {
   signInWithEmail,
   signOut,
   signUpWithEmail,
 } from './firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { Toast, Button } from 'react-bootstrap';
+import { Toast, Button, Input } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
@@ -24,7 +19,7 @@ function App() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isTokenFound, setTokenFound] = useState(false);
+  // const [isTokenFound, setTokenFound] = useState(false);
 
   const handleClick = async () => {
     console.log(messaging);
@@ -34,7 +29,6 @@ function App() {
       .then((currentToken) => {
         if (currentToken) {
           console.log('Token generated is ', currentToken);
-          setTokenFound(true);
           setShow(true);
           setNotification({
             title: 'success',
@@ -45,7 +39,7 @@ function App() {
         } else {
           // Show permission request.
           console.log('No ID token available. Request permission.');
-          setTokenFound(false);
+          // setTokenFound(false);
           requestPermission();
 
           // Show permission UI.
@@ -71,11 +65,13 @@ function App() {
     signInWithEmail(email, password).catch((err) => alert(err));
   };
 
-  useEffect(() => {
-    receiveMessage();
-
-    return () => receiveMessage();
-  }, []);
+  messaging.onMessage((payload) => {
+    console.log('Message received. ', payload);
+    new Notification({
+      title: payload.notification.title,
+      body: payload.notification.body,
+    });
+  });
 
   if (loading) {
     return (
@@ -118,11 +114,6 @@ function App() {
 
           <Button onClick={handleClick}>Get token</Button>
           <Button onClick={() => setShow(true)}>Show Toast</Button>
-          {isTokenFound ? (
-            <h3> Notification permission enabled 👍🏻 </h3>
-          ) : (
-            <h3> Need notification permission ❗️ </h3>
-          )}
 
           <Button type="button" onClick={signOut}>
             Sign out
@@ -134,14 +125,14 @@ function App() {
         <form onSubmit={handleSignIn}>
           <h1>Sign in</h1>
           <h3>Email:</h3>
-          <input
+          <Input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
           <br />
           <h3>Password:</h3>
-          <input
+          <Input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -155,7 +146,7 @@ function App() {
         <form onSubmit={handleRegister}>
           <h1>Register</h1>
           <h3>Username:</h3>
-          <input
+          <Input
             type="email"
             value={username}
             required={true}
@@ -163,7 +154,7 @@ function App() {
           />
           <br />
           <h3>Email:</h3>
-          <input
+          <Input
             type="email"
             value={email}
             required={true}
@@ -171,7 +162,7 @@ function App() {
           />
           <br />
           <h3>Password:</h3>
-          <input
+          <Input
             type="password"
             value={password}
             required={true}
