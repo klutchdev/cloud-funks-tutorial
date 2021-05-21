@@ -68,8 +68,13 @@ function App() {
   messaging.onMessage((payload) => {
     console.log('Message received. ', payload);
     new Notification({
-      title: payload.notification.title,
-      body: payload.notification.body,
+      title: payload.title,
+      body: payload.body,
+    });
+    setShow(true);
+    setNotification({
+      title: payload.title,
+      body: payload.body,
     });
   });
 
