@@ -2,37 +2,20 @@ import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 admin.initializeApp(functions.config().firebase);
 const adminDB = admin.firestore();
+const auth = functions.auth;
 const firestore = functions.firestore;
-const increment = admin.firestore.FieldValue.increment(1);
-const decrement = admin.firestore.FieldValue.increment(-1);
 const timestamp = admin.firestore.FieldValue.serverTimestamp();
-const onlineUserCount = adminDB.doc('counters/users-online');
 
 
+export const deleteUserAccount = auth
+  .user().onDelete(async (user, context) => {
 
-//==================| Firestore reference |=======================//
-//------
-// [COLLECTION] => [DOCUMENT] => { FIELD: <TYPE> }
-//------
-// ["counters"] => ["users-online"] => { count: <number> }
-// ["user-status"] => [uid] => { isOnline: <boolean> }
-// ["users"] => [uid] => { uid: <string>, updatedAt: <timestamp> }
-//-------
-//==================================================================//
-
-export const updateOnlineUser = firestore
-
-  .document(`user-status/{uid}`)
-  .onUpdate(async (snap, context) => {
 
     try {
-      const batch = adminDB.batch();
-      const after = snap.after.data();
+      const userID = user.uid;
+      const userRef = adminDB.doc(`users/${ userID }`);
 
-      // Add user auth checks here or the updates fail!!!
-      const userRef = adminDB.doc(`users/${ after.uid }`);
-
-      if (after.isOnline === false) {
+      if (user) {
         console.info(`User ${ after.uid } signed out at ${ context.timestamp }`);
         // Decrement online users counter
         batch.update(onlineUserCount, { count: decrement });
