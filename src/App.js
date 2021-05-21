@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import firebase, { auth } from './firebase';
+import React, { useEffect, useState } from 'react';
+import { auth, messaging } from './firebase';
 import {
   signInWithEmail,
   signOut,
@@ -22,56 +22,48 @@ function App() {
   const [isTokenFound, setTokenFound] = useState(false);
 
   function handleBgCb(payload) {
-    if (firebase.messaging.isSupported) {
-      console.log(payload);
+    console.log(payload);
 
-      setShow(true);
-      setNotification({
-        title: payload.notification.title,
-        body: payload.notification.body,
-      });
-    } else {
-      console.error('Messaging not supported');
-    }
+    setShow(true);
+    setNotification({
+      title: payload.notification.title,
+      body: payload.notification.body,
+    });
   }
 
-  function handleClick() {
-    if (firebase.messaging.isSupported) {
-      const messaging = firebase.messaging();
-      console.log(messaging);
-      messaging.onMessage(handleBgCb);
-      messaging
-        .getToken()
-        .then((currentToken) => {
-          if (currentToken) {
-            console.log('Token generated is ', currentToken);
-            setTokenFound(true);
-            setNotification({
-              title: 'success',
-              body: 'Token generated is: ' + currentToken,
-            });
-            // sendTokenToServer(currentToken);
-            // updateUIForPushEnabled(currentToken);
-          } else {
-            // Show permission request.
-            console.log('No ID token available. Request permission.');
-            setTokenFound(false);
+  const handleClick = async () => {
+    console.log(messaging);
 
-            // Show permission UI.
-            // updateUIForPushPermissionRequired();
-            // setTokenSentToServer(false);
-          }
-        })
-        .catch((err) =>
-          console.error(
-            'An error occurred while retrieving token. ',
-            err
-          )
-        );
-    } else {
-      console.error('Messaging not supported');
-    }
-  }
+    await messaging
+      .getToken()
+      .then((currentToken) => {
+        if (currentToken) {
+          console.log('Token generated is ', currentToken);
+          setTokenFound(true);
+          setShow(true);
+          setNotification({
+            title: 'success',
+            body: 'Token generated is: ' + currentToken,
+          });
+          // sendTokenToServer(currentToken);
+          // updateUIForPushEnabled(currentToken);
+        } else {
+          // Show permission request.
+          console.log('No ID token available. Request permission.');
+          setTokenFound(false);
+
+          // Show permission UI.
+          // updateUIForPushPermissionRequired();
+          // setTokenSentToServer(false);
+        }
+      })
+      .catch((err) =>
+        console.error(
+          'An error occurred while retrieving token. ',
+          err
+        )
+      );
+  };
 
   const handleRegister = (e) => {
     e.preventDefault();
@@ -81,6 +73,12 @@ function App() {
     e.preventDefault();
     signInWithEmail(email, password).catch((err) => alert(err));
   };
+
+  useEffect(() => {
+    const onMsg = messaging.onMessage(handleBgCb);
+
+    return () => onMsg();
+  }, []);
 
   if (loading) {
     return (

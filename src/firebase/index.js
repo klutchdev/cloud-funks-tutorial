@@ -10,4 +10,5 @@ if (!firebase.apps.length) {
 
 export const auth = firebase.auth();
 export const firestore = firebase.firestore();
+export const messaging = firebase.messaging();
 export default firebase;

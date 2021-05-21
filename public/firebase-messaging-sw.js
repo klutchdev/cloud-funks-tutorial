@@ -1,27 +1,26 @@
-importScripts("https://www.gstatic.com/8.6.1/firebase-app.js");
-importScripts("https://www.gstatic.com/8.6.1/firebase-messaging.js");
-// Initialize the Firebase app in the service worker by passing in the
-// messagingSenderId.
-firebase.initializeApp({ messagingSenderId: "131840670968" });
-// Retrieve an instance of Firebase Messaging so that it can handle background
-// messages.
-const messaging = firebase.messaging();
-// [END initialize_firebase_in_sw]
+/* eslint-disable no-undef */
+// Add imports and config for firebase messaging
+importScripts("https://www.gstatic.com/firebasejs/7.16.1/firebase-app.js");
+importScripts(
+  "https://www.gstatic.com/firebasejs/7.16.1/firebase-messaging.js"
+);
 
-// If you would like to customize notifications that are received in the
-// background (Web app is closed or not in browser focus) then you should
-// implement this optional method.
-// [START background_handler]
+let self;
+
+firebase.initializeApp({
+  messagingSenderId: "131840670968",
+  apiKey: "AIzaSyCVt9q7hQtIDhCGj3e6klG0xDMpQY_41FY",
+  projectId: "slackhelp",
+  appId: "1:131840670968:web:1cad98bddc21729953cf0d",
+});
+const messaging = firebase.messaging();
+
 messaging.setBackgroundMessageHandler((payload) => {
-  console.log(
-    "[firebase-messaging-sw.js] Received background message ",
-    payload
-  );
+  console.log("Received background message ", payload);
   // Customize notification here
-  const notificationTitle = "Background Message Title";
+  const notificationTitle = payload.title;
   const notificationOptions = {
-    body: "Background Message body.",
-    // icon: '/firebase-logo.png'
+    body: payload.body || "Background Message body",
   };
 
   return self.registration.showNotification(
@@ -29,3 +28,17 @@ messaging.setBackgroundMessageHandler((payload) => {
     notificationOptions
   );
 });
+
+/* 
+curl -X POST -H "Authorization: key=<Server Key>" \
+   -H "Content-Type: application/json" \
+   -d '{
+  "data": {
+    "notification": {
+        "title": "FCM Message",
+        "body": "This is an FCM Message",
+        "icon": "/itwonders-web-logo.png",
+    }
+  },
+  "to": "<DEVICE_REGISTRATION_TOKEN>"
+}' https://fcm.googleapis.com/fcm/send */
