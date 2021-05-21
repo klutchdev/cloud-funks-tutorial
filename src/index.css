@@ -1,0 +1,57 @@
+/* Tip: If you see an "Unknown at rule @import-normalize css(unknownAtRules)"
+warning in VSCode,change the css.lint.unknownAtRules setting to ignore. */
+@import-normalize;
+
+:root {
+  --dark: #2a2a2a;
+  --welcome-text: #ff6f00;
+  --svg: #ea60ff;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--dark);
+}
+
+.center {
+  position: absolute;
+  top: 25%;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.center h1 {
+  color: var(--welcome-text);
+  font-size: 4rem;
+  font-weight: 400;
+}
+
+.animated-svg {
+  margin: auto;
+  color: var(--svg);
+  animation-name: animate;
+  animation-iteration-count: infinite;
+  animation-duration: 5s;
+  animation-timing-function: linear;
+}
+
+@keyframes animate {
+  0% {
+    filter: hue-rotate(0deg);
+    transform: rotate(0deg);
+  }
+
+  100% {
+    filter: hue-rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
