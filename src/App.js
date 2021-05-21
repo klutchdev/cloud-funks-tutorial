@@ -65,6 +65,18 @@ function App() {
     signInWithEmail(email, password).catch((err) => alert(err));
   };
 
+  messaging.onMessage((payload) => {
+    console.log('Message received. ', payload);
+    new Notification({
+      title: payload.notification.title,
+      body: payload.notification.body,
+    });
+    setNotification({
+      title: payload.notification.title,
+      body: payload.notification.body,
+    });
+  });
+
   if (loading) {
     return (
       <div className="center">
@@ -79,19 +91,6 @@ function App() {
       </div>
     );
   } else {
-    messaging.onMessage((payload) => {
-      console.log('Message received. ', payload);
-      const options = { body: payload.body };
-      new Notification({
-        title: payload.title,
-        options,
-      });
-      setNotification({
-        title: payload.title,
-        body: payload.body,
-      });
-      setShow(true);
-    });
     return user ? (
       <>
         <Toast
@@ -120,10 +119,10 @@ function App() {
         <div className="center">
           <h1>Welcome,</h1>
           <h3>{user.email}!</h3>
+
           <Button onClick={handleClick}>Get token</Button>
-          <br />
           <Button onClick={() => setShow(true)}>Show Toast</Button>
-          <br />
+
           <Button type="button" onClick={signOut}>
             Sign out
           </Button>
