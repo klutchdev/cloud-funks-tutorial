@@ -13,7 +13,7 @@ import { useEffect } from 'react';
 function App() {
   const [user, loading, error] = useAuthState(auth);
   const [show, setShow] = useState(false);
-  const [toast, setToast] = useState({
+  const [toastText, setToastText] = useState({
     title: '',
     body: '',
   });
@@ -31,7 +31,7 @@ function App() {
         if (currentToken) {
           console.log('Token generated is ', currentToken);
           setShow(true);
-          setToast({
+          setToastText({
             title: 'success',
             body: 'Token generated is: ' + currentToken,
           });
@@ -75,9 +75,9 @@ function App() {
       };
 
       new Notification(notificationTitle, notificationOptions);
-      setToast({
-        title: payload.notification.title,
-        body: payload.notification,
+      setToastText({
+        title: notificationTitle,
+        body: notificationOptions,
       });
     });
   }, []);
@@ -112,11 +112,13 @@ function App() {
           }}
         >
           <Toast.Header>
-            <strong className="mr-auto">{toast.title}</strong>
+            <strong className="mr-auto">{toastText.title}</strong>
             <small>just now</small>
           </Toast.Header>
           <Toast.Body>
-            <span style={{ color: '#212121' }}>{toast.body}</span>
+            <span style={{ color: '#212121' }}>
+              {toastText?.body}
+            </span>
           </Toast.Body>
         </Toast>
         <div className="center">
