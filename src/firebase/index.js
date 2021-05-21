@@ -10,7 +10,7 @@ if (!firebase.apps.length) {
 
 export const auth = firebase.auth();
 export const firestore = firebase.firestore();
-// export const messaging = firebase.messaging();
+export const messaging = firebase.messaging();
 
 export const receiveMessage = () => {
   const messaging = firebase.messaging();
