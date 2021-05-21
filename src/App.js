@@ -6,7 +6,7 @@ import {
   signUpWithEmail,
 } from './firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { Toast, Button, Input } from 'react-bootstrap';
+import { Toast, Button, Form } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
@@ -92,7 +92,7 @@ function App() {
         <Toast
           onClose={() => setShow(false)}
           show={show}
-          delay={3000}
+          delay={5000}
           autohide
           animation
           style={{
@@ -106,7 +106,11 @@ function App() {
             <strong className="mr-auto">{notification.title}</strong>
             <small>just now</small>
           </Toast.Header>
-          <Toast.Body>{notification.body}</Toast.Body>
+          <Toast.Body>
+            <span style={{ color: '#212121' }}>
+              {notification.body}
+            </span>
+          </Toast.Body>
         </Toast>
         <div className="center">
           <h1>Welcome,</h1>
@@ -122,31 +126,31 @@ function App() {
       </>
     ) : (
       <div className="center">
-        <form onSubmit={handleSignIn}>
+        <Form onSubmit={handleSignIn}>
           <h1>Sign in</h1>
           <h3>Email:</h3>
-          <Input
+          <Form.Control
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
           <br />
           <h3>Password:</h3>
-          <Input
+          <Form.Control
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
           <br />
           <Button type="submit">Sign in</Button>
-        </form>
+        </Form>
         <br />
         <hr />
         <br />
-        <form onSubmit={handleRegister}>
+        <Form onSubmit={handleRegister}>
           <h1>Register</h1>
           <h3>Username:</h3>
-          <Input
+          <Form.Control
             type="email"
             value={username}
             required={true}
@@ -154,7 +158,7 @@ function App() {
           />
           <br />
           <h3>Email:</h3>
-          <Input
+          <Form.Control
             type="email"
             value={email}
             required={true}
@@ -162,7 +166,7 @@ function App() {
           />
           <br />
           <h3>Password:</h3>
-          <Input
+          <Form.Control
             type="password"
             value={password}
             required={true}
@@ -172,7 +176,7 @@ function App() {
           <Button disabled={password.length < 8} type="submit">
             Register
           </Button>
-        </form>
+        </Form>
         <br />
       </div>
     );
